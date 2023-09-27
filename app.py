@@ -297,7 +297,7 @@ def get_example():
             # '',
             'cherry blossom', 'green cabriolet',
             '',
-             'examples/car_output.jpg',
+             'examples/car_output.png',
             
             
             10,7,
