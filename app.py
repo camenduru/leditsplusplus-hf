@@ -698,14 +698,14 @@ with gr.Blocks(css="style.css") as demo:
                 with gr.Column(min_width=100):
                    clear_button = gr.Button("Clear", visible=True)
                    src_prompt = gr.Textbox(lines=1, label="Source Prompt", interactive=True, placeholder="")
-                   steps = gr.Number(value=100, precision=0, label="Num Diffusion Steps", interactive=True)
+                   steps = gr.Number(value=50, precision=0, label="Num Diffusion Steps", interactive=True)
                    src_cfg_scale = gr.Number(value=3.5, label=f"Source Guidance Scale", interactive=True)
                    mask_type = gr.Radio(choices=["No mask", "Cross Attention Mask", "Intersect Mask"], value="Intersect Mask", label="Mask type")
 
                 with gr.Column(min_width=100):
                     reconstruct_button = gr.Button("Show Reconstruction", visible=False)
-                    skip = gr.Slider(minimum=0, maximum=60, value=36, step=1, label="Skip Steps", interactive=True, info = "At which step to start denoising. Bigger values increase fidelity to input image")
-                    tar_cfg_scale = gr.Slider(minimum=1, maximum=30,value=15, label=f"Guidance Scale", interactive=True)
+                    skip = gr.Slider(minimum=0, maximum=95, value=25, step=1, label="Skip Steps", interactive=True, info = "Percentage of skipped denoising steps. Bigger values increase fidelity to input image")
+                    tar_cfg_scale = gr.Slider(minimum=1, maximum=30,value=7.5, label=f"Guidance Scale", interactive=True)
                     seed = gr.Number(value=0, precision=0, label="Seed", interactive=True)
                     randomize_seed = gr.Checkbox(label='Randomize seed', value=False)
 
