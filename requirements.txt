@@ -3,3 +3,4 @@ accelerate
 transformers
 torch
 torchvision
+gradio==3.43.0
