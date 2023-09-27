@@ -6,12 +6,9 @@ import random
 from io import BytesIO
 from utils import *
 from constants import *
-# from inversion_utils import *
-# from inversion_utils_dpmplusplus import *
-#from modified_pipeline_semantic_stable_diffusion import SemanticStableDiffusionPipeline
 from pipeline_semantic_stable_diffusion_img2img_solver import SemanticStableDiffusionImg2ImgPipeline_DPMSolver
 from torch import autocast, inference_mode
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, AutoencoderKL
 from diffusers.schedulers import DDIMScheduler
 from scheduling_dpmsolver_multistep_inject import DPMSolverMultistepSchedulerInject
 from transformers import AutoProcessor, BlipForConditionalGeneration
@@ -20,16 +17,13 @@ from share_btn import community_icon_html, loading_icon_html, share_js
 # load pipelines
 sd_model_id = "runwayml/stable-diffusion-v1-5"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-pipe = SemanticStableDiffusionImg2ImgPipeline_DPMSolver.from_pretrained(sd_model_id,torch_dtype=torch.float16).to(device)
-# pipe.scheduler = DDIMScheduler.from_config(sd_model_id, subfolder = "scheduler")
+vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=torch.float16)
+pipe = SemanticStableDiffusionImg2ImgPipeline_DPMSolver.from_pretrained(sd_model_id,vae=vae,torch_dtype=torch.float16).to(device)
 pipe.scheduler = DPMSolverMultistepSchedulerInject.from_pretrained(sd_model_id, subfolder="scheduler"
                                                              , algorithm_type="sde-dpmsolver++", solver_order=2)
 
 blip_processor = AutoProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
 blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base",torch_dtype=torch.float16).to(device)
-
-
 
 ## IMAGE CPATIONING ##
 def caption_image(input_image):
@@ -39,65 +33,6 @@ def caption_image(input_image):
     generated_ids = blip_model.generate(pixel_values=pixel_values, max_length=50)
     generated_caption = blip_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     return generated_caption, generated_caption
-
-
-
-## DDPM INVERSION AND SAMPLING ##
-# def invert(x0, prompt_src="", num_diffusion_steps=100, cfg_scale_src = 3.5, eta = 1):
-
-#   #  inverts a real image according to Algorihm 1 in https://arxiv.org/pdf/2304.06140.pdf,
-#   #  based on the code in https://github.com/inbarhub/DDPM_inversion
-
-#   #  returns wt, zs, wts:
-#   #  wt - inverted latent
-#   #  wts - intermediate inverted latents
-#   #  zs - noise maps
-
-#   sd_pipe.scheduler.set_timesteps(num_diffusion_steps)
-
-#   # vae encode image
-#   with inference_mode():
-#     w0 = (sd_pipe.vae.encode(x0).latent_dist.mode() * 0.18215)
-
-#   # find Zs and wts - forward process
-#   wt, zs, wts = inversion_forward_process(sd_pipe, w0, etas=eta, prompt=prompt_src, cfg_scale=cfg_scale_src, prog_bar=True, num_inference_steps=num_diffusion_steps)
-#   return zs, wts
-
-
-# def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta = 1):
-
-#     # reverse process (via Zs and wT)
-#     w0, _ = inversion_reverse_process(sd_pipe, xT=wts[skip], etas=eta, prompts=[prompt_tar], cfg_scales=[cfg_scale_tar], prog_bar=True, zs=zs[skip:])
-
-#     # vae decode image
-#     with inference_mode():
-#       x0_dec = sd_pipe.vae.decode(1 / 0.18215 * w0).sample
-#     if x0_dec.dim()<4:
-#         x0_dec = x0_dec[None,:,:,:]
-#     img = image_grid(x0_dec)
-#     return img
-
-# def reconstruct(tar_prompt,
-#                 image_caption,
-#                 tar_cfg_scale,
-#                 skip,
-#                 wts, zs,
-#                 do_reconstruction,
-#                 reconstruction,
-#                 reconstruct_button
-#                ):
-
-#     if reconstruct_button == "Hide Reconstruction":
-#       return reconstruction.value, reconstruction, ddpm_edited_image.update(visible=False), do_reconstruction, "Show Reconstruction"
-
-#     else:
-#       if do_reconstruction:
-#           if image_caption.lower() == tar_prompt.lower(): # if image caption was not changed, run actual reconstruction
-#              tar_prompt = ""
-#           reconstruction_img = sample(zs.value, wts.value, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
-#           reconstruction = gr.State(value=reconstruction_img)
-#           do_reconstruction = False
-#       return reconstruction.value, reconstruction, ddpm_edited_image.update(visible=True), do_reconstruction, "Hide Reconstruction"
 
 def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta = 1):
     
@@ -111,8 +46,6 @@ def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta = 1):
                           # wts=wts.value, 
                           zs=zs.value).images[0]
     return img
-
-
 
 def reconstruct(tar_prompt,
                 image_caption,
@@ -904,4 +837,3 @@ with gr.Blocks(css="style.css") as demo:
 
 demo.queue()
 demo.launch()
-# demo.launch(share=True)
