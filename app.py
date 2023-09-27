@@ -817,7 +817,7 @@ with gr.Blocks(css="style.css") as demo:
         outputs = [do_inversion],
         queue = False).then(
         fn = randomize_seed_fn,
-        inputs = [seed, randomize_seed],
+        # inputs = [seed, randomize_seed],
         outputs = [seed], queue = False)
     # Automatically start inverting upon input_image change
     input_image.upload(fn = crop_image, inputs = [input_image], outputs = [input_image],queue=False).then(
@@ -825,7 +825,7 @@ with gr.Blocks(css="style.css") as demo:
         outputs = [do_inversion],
         queue = False).then(
         fn = randomize_seed_fn,
-        inputs = [seed, randomize_seed],
+        # inputs = [seed, randomize_seed],
         outputs = [seed], queue = False).then(fn = caption_image,
         inputs = [input_image],
         outputs = [tar_prompt, image_caption]).then(fn = update_inversion_progress_visibility, inputs =[input_image,do_inversion],
@@ -925,7 +925,7 @@ with gr.Blocks(css="style.css") as demo:
 
     randomize_seed.change(
         fn = randomize_seed_fn,
-        inputs = [seed, randomize_seed],
+        # inputs = [seed, randomize_seed],
         outputs = [seed],
         queue = False)
 
