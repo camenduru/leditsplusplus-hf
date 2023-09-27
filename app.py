@@ -293,20 +293,20 @@ def crop_image(image):
 def get_example():
     case = [
         [
-            'examples/lemons_input.jpg', 
+            'examples/car_input.png', 
             # '',
-            'apples', 'lemons',
-            'a ceramic bowl',
-             'examples/lemons_output.jpg',
+            'cherry blossom', 'green cabriolet',
+            '',
+             'examples/car_output.jpg',
             
             
-            7,7,
-            1,1,
-            False, True,
+            10,7,
+            2,2,
+            False, False,
             50,
             25,
-            5,
-            0.95, 0.95
+            7.5,
+            0.65, 0.8
            
              ],
         [
