@@ -12,8 +12,8 @@ from diffusers.models import AutoencoderKL, UNet2DConditionModel
 from diffusers.models.attention_processor import AttnProcessor, Attention
 from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 from diffusers.schedulers import KarrasDiffusionSchedulers
-from diffusers.utils import logging, randn_tensor
-# from diffusers.utils.torch_utils import randn_tensor
+from diffusers.utils import logging
+from diffusers.utils.torch_utils import randn_tensor
 from diffusers.pipelines.pipeline_utils import DiffusionPipeline
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
 # from . import SemanticStableDiffusionPipelineOutput
