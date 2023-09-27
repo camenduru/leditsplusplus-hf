@@ -158,6 +158,9 @@ def load_and_invert(
     # x0 = load_512(input_image, device=device).to(torch.float16)
 
     if do_inversion or randomize_seed:
+        if randomize_seed:
+            seed = randomize_seed_fn()
+        seed_everything(seed)
         # invert and retrieve noise maps and latent
         zs_tensor, wts_tensor = pipe.invert(
            image_path = input_image,
@@ -206,6 +209,11 @@ def edit(input_image,
     elif(mask_type=="Intersect Mask"):
         use_cross_attn_mask = False
         use_intersect_mask = True 
+
+    if randomize_seed:
+        seed = randomize_seed_fn()
+    seed_everything(seed)
+
     if do_inversion or randomize_seed:
         zs_tensor, wts_tensor = pipe.invert(
            image_path = input_image,
@@ -259,11 +267,15 @@ def edit(input_image,
       return reconstruction.value, reconstruct_button.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
         
 
-def randomize_seed_fn(seed, randomize_seed):
-    if randomize_seed:
-        seed = random.randint(0, np.iinfo(np.int32).max)
-    torch.manual_seed(seed)
+def randomize_seed_fn():
+    seed = random.randint(0, np.iinfo(np.int32).max)
     return seed
+
+def seed_everything(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
 
 def crop_image(image):
     h, w, c = image.shape
