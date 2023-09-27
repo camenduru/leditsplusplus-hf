@@ -1160,7 +1160,8 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
         self.scheduler.timesteps = timesteps
         
         # Reset attn processor, we do not want to store attn maps during inversion
-        self.unet.set_default_attn_processor()
+        # self.unet.set_default_attn_processor()
+        self.unet.set_attn_processor(AttnProcessor())
 
         # 1. get embeddings
 
