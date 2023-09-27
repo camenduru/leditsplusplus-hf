@@ -332,7 +332,7 @@ def get_example():
             # '',
             'pink tulips', 'red flowers',
             'van gogh painting',
-             'examples/flower_field_output_2.jpg',
+             'examples/flower_field_output.png',
 
 
             20,7,
