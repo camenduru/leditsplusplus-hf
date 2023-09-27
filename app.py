@@ -303,9 +303,10 @@ def get_example():
             7,7,
             1,1,
             False, True,
-            100,
-            36,
-            15,
+            50,
+            25,
+            5,
+            0.95, 0.95
            
              ],
         [
@@ -319,55 +320,31 @@ def get_example():
             3,7,
             3,2,
             False,False,
-            100,
-            36,
-            15,
+            50,
+            25,
+            5,
+            0.97, 0.95
            
              ],
-        [
-            'examples/rockey_shore_input.jpg', 
-            # '',
-            'sea turtle', '',
-            'watercolor painting',
-            'examples/rockey_shore_output.jpg',
-            
-            
-            7,7,
-            1,2,
-            False,False,
-            100,
-            36,
-            15,
-             ],
+        
                  [
             'examples/flower_field_input.jpg', 
             # '',
-            'wheat', 'red flowers',
-            'oil painting',
+            'pink tulips', 'red flowers',
+            'van gogh painting',
              'examples/flower_field_output_2.jpg',
 
 
             20,7,
             1,1,
                      False,True,
-                      100,
-            36,
-            15,
+                      50,
+            25,
+            7,
+                     0.9, 0.9
             
              ],
-        [
-            'examples/butterfly_input.jpg', 
-            # '',
-             'bee', 'butterfly',
-            'oil painting',
-            'examples/butterfly_output.jpg',      
-            7, 7,
-            1,1,
-            False, True,
-                        100,
-            36,
-            15,
-             ]
+       
  ]
     return case
 
@@ -386,6 +363,8 @@ def swap_visibilities(input_image,
                     steps,
                     skip,
                     tar_cfg_scale,
+                    threshold_1,
+                    threshold_2,
                     sega_concepts_counter
                     
 ):
@@ -914,6 +893,8 @@ with gr.Blocks(css="style.css") as demo:
                     steps,
                     skip,
                     tar_cfg_scale,
+                    threshold_1, 
+                    threshold_2,
                     sega_concepts_counter
                ],
         outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,sega_concepts_counter],
