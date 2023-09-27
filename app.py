@@ -871,6 +871,8 @@ with gr.Blocks(css="style.css") as demo:
         outputs = [do_reconstruction], queue = False)
 
     skip.change(
+        fn = reset_do_inversion,
+        outputs = [do_inversion], queue = False).then(
         fn = reset_do_reconstruction,
         outputs = [do_reconstruction], queue = False)
 
