@@ -131,14 +131,7 @@ def reconstruct(tar_prompt,
           if image_caption.lower() == tar_prompt.lower(): # if image caption was not changed, run actual reconstruction
              tar_prompt = ""
           latnets = wts.value[-1].expand(1, -1, -1, -1)
-          reconstruction_img = pipe(prompt=tar_prompt, 
-                          init_latents=latnets, 
-                          guidance_scale = tar_cfg_scale,
-                          # num_images_per_prompt=1,
-                          # num_inference_steps=steps,
-                          # use_ddpm=True,  
-                          # wts=wts.value, 
-                          zs=zs.value).images[0]
+          reconstruction_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
           reconstruction = gr.State(value=reconstruction_img)
           do_reconstruction = False
       return reconstruction.value, reconstruction, ddpm_edited_image.update(visible=True), do_reconstruction, "Hide Reconstruction"
@@ -258,7 +251,7 @@ def edit(input_image,
     else: # if sega concepts were not added, performs regular ddpm sampling
       
       if do_reconstruction: # if ddpm sampling wasn't computed
-          pure_ddpm_img = sample(zs.value, wts.value, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
+          pure_ddpm_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
           reconstruction = gr.State(value=pure_ddpm_img)
           do_reconstruction = False
           return pure_ddpm_img, reconstruct_button.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
