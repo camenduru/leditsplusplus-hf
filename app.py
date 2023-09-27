@@ -409,15 +409,9 @@ intro = """
 <h1 style="font-weight: 1400; text-align: center; margin-bottom: 7px;">
    LEDITS++: Limitless Image Editing using Text-to-Image Models
 </h1>
-# <h3 style="font-weight: 600; text-align: center;">
-#     Real Image Editing with Edit Friendly DDPM and Semantic Guidance
-# </h3>
-<h4 style="text-align: center; margin-bottom: 7px;">
-    <a href="https://editing-images-project.hf.space/" style="text-decoration: underline;" target="_blank">Project Page</a> | <a href="https://arxiv.org/abs/2307.00522" style="text-decoration: underline;" target="_blank">ArXiv</a>
-</h4>
 
 <p style="font-size: 0.9rem; margin: 0rem; line-height: 1.2em; margin-top:1em">
-<a href="https://huggingface.co/spaces/editing-images/edit_friendly_ddpm_x_sega?duplicate=true">
+<a href="https://huggingface.co/spaces/leditsplusplus/demo?duplicate=true">
 <img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3CWLGkA" alt="Duplicate Space"></a>
 <p/>"""
 
