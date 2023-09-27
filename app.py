@@ -103,7 +103,7 @@ def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta = 1):
     latnets = wts.value[-1].expand(1, -1, -1, -1)
     img = pipe(prompt=prompt_tar, 
                           init_latents=latnets, 
-                          guidance_scale = tar_cfg_scale,
+                          guidance_scale = cfg_scale_tar,
                           # num_images_per_prompt=1,
                           # num_inference_steps=steps,
                           # use_ddpm=True,  
