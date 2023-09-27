@@ -23,7 +23,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 pipe = SemanticStableDiffusionImg2ImgPipeline_DPMSolver.from_pretrained(sd_model_id,torch_dtype=torch.float16).to(device)
 # pipe.scheduler = DDIMScheduler.from_config(sd_model_id, subfolder = "scheduler")
-pipe.scheduler = DPMSolverMultistepSchedulerInject(algorithm_type="sde-dpmsolver++", solver_order=2)
+pipe.scheduler = DPMSolverMultistepSchedulerInject.from_pretrained(sd_model_id, subfolder="scheduler"
+                                                             , algorithm_type="sde-dpmsolver++", solver_order=2)
 
 blip_processor = AutoProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
 blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base",torch_dtype=torch.float16).to(device)
