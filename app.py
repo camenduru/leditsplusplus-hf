@@ -407,11 +407,11 @@ def swap_visibilities(input_image,
 
 intro = """
 <h1 style="font-weight: 1400; text-align: center; margin-bottom: 7px;">
-   LEDITS - Pipeline for editing images
+   LEDITS++: Limitless Image Editing using Text-to-Image Models
 </h1>
-<h3 style="font-weight: 600; text-align: center;">
-    Real Image Latent Editing with Edit Friendly DDPM and Semantic Guidance
-</h3>
+# <h3 style="font-weight: 600; text-align: center;">
+#     Real Image Editing with Edit Friendly DDPM and Semantic Guidance
+# </h3>
 <h4 style="text-align: center; margin-bottom: 7px;">
     <a href="https://editing-images-project.hf.space/" style="text-decoration: underline;" target="_blank">Project Page</a> | <a href="https://arxiv.org/abs/2307.00522" style="text-decoration: underline;" target="_blank">ArXiv</a>
 </h4>
@@ -421,36 +421,6 @@ intro = """
 <img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3CWLGkA" alt="Duplicate Space"></a>
 <p/>"""
 
-help_text = """
-- **Getting Started - edit images with DDPM X SEGA:**
-
-    The are 3 general setting options you can play with -
-
-    1. **Pure DDPM Edit -** Describe the desired edited output image in detail
-    2. **Pure SEGA Edit -** Keep the target prompt empty ***or*** with a description of the original image and add editing concepts for Semantic Gudiance editing
-    3. **Combined -** Describe the desired edited output image in detail and add additional SEGA editing concepts on top
-- **Getting Started - Tips**
-
-    While the best approach depends on your editing objective and source image,  we can layout a few guiding tips to use as a starting point -
-
-    1. **DDPM** is usually more suited for scene/style changes and major subject changes (for example ) while **SEGA** allows for more fine grained control, changes are more delicate, more suited for adding details (for example facial expressions and attributes, subtle style modifications, object adding/removing)
-    2. The more you describe the scene in the target prompt (both the parts and details you wish to keep the same and those you wish to change), the better the result
-    3. **Combining DDPM Edit with SEGA -**
-    Try dividing your editing objective to more significant scene/style/subject changes and detail adding/removing and more moderate changes. Then describe the major changes in a detailed target prompt and add the more fine grained details as SEGA concepts.
-    4. **Reconstruction:** Using an empty source prompt + target prompt will lead to a perfect reconstruction
-- **Fidelity vs creativity**:
-
-    Bigger values → more fidelity, smaller values → more creativity
-
-    1. `Skip Steps`
-    2. `Warmup` (SEGA)
-    3. `Threshold`  (SEGA)
-
-    Bigger values → more creativity, smaller values → more fidelity
-
-    1. `Guidance Scale`
-    2. `Concept Guidance Scale` (SEGA)
-"""
 
 with gr.Blocks(css="style.css") as demo:
     def update_counter(sega_concepts_counter, concept1, concept2, concept3):
