@@ -765,6 +765,10 @@ with gr.Blocks(css="style.css") as demo:
         fn = reset_do_reconstruction,
         outputs = [do_reconstruction], queue = False)
 
+    seed.change(fn=reset_do_inversion, outputs=[do_inversion], queue=False).then(
+        fn=reset_do_reconstruction, outputs=[do_reconstruction], queue=False
+    )
+
     dropdown1.change(fn=update_dropdown_parms, inputs = [dropdown1], outputs = [guidnace_scale_1,warmup_1,  threshold_1], queue=False)
     dropdown2.change(fn=update_dropdown_parms, inputs = [dropdown2], outputs = [guidnace_scale_2,warmup_2,  threshold_2], queue=False)
     dropdown3.change(fn=update_dropdown_parms, inputs = [dropdown3], outputs = [guidnace_scale_3,warmup_3,  threshold_3], queue=False)
