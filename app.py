@@ -605,7 +605,7 @@ with gr.Blocks(css="style.css") as demo:
                   warmup_1 = gr.Slider(label='Warmup', minimum=0, maximum=50,
                                        value=DEFAULT_WARMUP_STEPS,
                                        step=1, interactive=True, info="At which step to start applying semantic guidance. Bigger values reduce edit concept's effect")
-                  threshold_1 = gr.Slider(label='Threshold', minimum=0.5, maximum=0.99,
+                  threshold_1 = gr.Slider(label='Threshold', minimum=0.1, maximum=0.99,
                                           value=DEFAULT_THRESHOLD, step=0.01, interactive=True, 
                                           info = "Lower the threshold for more effect (e.g. ~0.9 for style transfer)")
 
@@ -615,7 +615,7 @@ with gr.Blocks(css="style.css") as demo:
                   warmup_2 = gr.Slider(label='Warmup', minimum=0, maximum=50,
                                        value=DEFAULT_WARMUP_STEPS,
                                        step=1, interactive=True, info="At which step to start applying semantic guidance. Bigger values reduce edit concept's effect")
-                  threshold_2 = gr.Slider(label='Threshold', minimum=0.5, maximum=0.99,
+                  threshold_2 = gr.Slider(label='Threshold', minimum=0.1, maximum=0.99,
                                           value=DEFAULT_THRESHOLD,
                                           step=0.01, interactive=True,
                                          info = "Lower the threshold for more effect (e.g. ~0.9 for style transfer)")
@@ -625,7 +625,7 @@ with gr.Blocks(css="style.css") as demo:
                   warmup_3 = gr.Slider(label='Warmup', minimum=0, maximum=50,
                                        value=DEFAULT_WARMUP_STEPS, step=1,
                                        interactive=True, info="At which step to start applying semantic guidance. Bigger values reduce edit concept's effect")
-                  threshold_3 = gr.Slider(label='Threshold', minimum=0.5, maximum=0.99,
+                  threshold_3 = gr.Slider(label='Threshold', minimum=0.1, maximum=0.99,
                                           value=DEFAULT_THRESHOLD, step=0.01,
                                           interactive=True,
                                          info = "Lower the threshold for more effect (e.g. ~0.9 for style transfer)")
