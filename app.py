@@ -587,7 +587,7 @@ with gr.Blocks(css="style.css") as demo:
                                 elem_id="target_prompt",
                                 # show_label=False,
                                 max_lines=1, value="", scale=3,
-                                placeholder="Target prompt, DDPM Inversion", info = "DDPM Inversion Prompt. Can help with global changes, modify to what you would like to see"
+                                placeholder="Target prompt, DDPM Inversion", info = "DPM Solver++ Inversion Prompt. Can help with global changes, modify to what you would like to see"
                             )
                 # caption_button = gr.Button("Caption Image", scale=1)
         
