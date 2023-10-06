@@ -1058,7 +1058,7 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
         self.scheduler.num_inference_steps = timesteps.shape[0]
         self.scheduler.timesteps = timesteps
 
-
+        self.unet.set_attn_processor(AttnProcessor())
         # 1. get embeddings
 
         uncond_embedding = self.encode_text("")
