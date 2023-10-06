@@ -35,7 +35,7 @@ def caption_image(input_image):
     return generated_caption, generated_caption
 
 def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
-    latents = wts.value[-1].expand(1, -1, -1, -1)
+    latents = wts[-1].expand(1, -1, -1, -1)
     img = pipe(
         prompt=prompt_tar,
         init_latents=latents,
@@ -205,10 +205,11 @@ def edit(input_image,
       
       return sega_out.images[0], reconstruct_button.update(visible=True), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
     
+    
     else: # if sega concepts were not added, performs regular ddpm sampling
       
       if do_reconstruction: # if ddpm sampling wasn't computed
-          pure_ddpm_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
+          pure_ddpm_img = sample(zs.value, wts.value, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
           reconstruction = gr.State(value=pure_ddpm_img)
           do_reconstruction = False
           return pure_ddpm_img, reconstruct_button.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
