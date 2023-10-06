@@ -111,7 +111,7 @@ def load_and_invert(
             seed = randomize_seed_fn()
         seed_everything(seed)
         # invert and retrieve noise maps and latent
-        zs, wts = pipe.invert(
+        zs_tensor, wts_tensor = pipe.invert(
             image_path=input_image,
             source_prompt=src_prompt,
             source_guidance_scale=src_cfg_scale,
@@ -119,6 +119,8 @@ def load_and_invert(
             skip=skip,
             eta=1.0,
         )
+        wts = gr.State(value=wts_tensor)
+        zs = gr.State(value=zs_tensor)
         do_inversion = False
 
     return wts, zs, do_inversion, inversion_progress.update(visible=False)
