@@ -611,7 +611,7 @@ with gr.Blocks(css="style.css") as demo:
                     reconstruct_button = gr.Button("Show Reconstruction", visible=False)
                     skip = gr.Slider(minimum=0, maximum=95, value=25, step=1, label="Skip Steps", interactive=True, info = "Percentage of skipped denoising steps. Bigger values increase fidelity to input image")
                     tar_cfg_scale = gr.Slider(minimum=1, maximum=30,value=7.5, label=f"Guidance Scale", interactive=True)
-                    seed = gr.Number(value=0, precision=0, label="Seed", interactive=True, randomize=True)
+                    seed = gr.Slider(minimum=0, maximum=np.iinfo(np.int32).max, label="Seed", interactive=True, randomize=True)
                     randomize_seed = gr.Checkbox(label='Randomize seed', value=False)
 
           with gr.TabItem('SEGA options', id=3) as sega_advanced_tab:
