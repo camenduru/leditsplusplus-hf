@@ -187,7 +187,7 @@ def edit(input_image,
       edit_guidance_scale=[guidnace_scale_1,guidnace_scale_2,guidnace_scale_3],
       edit_threshold=[threshold_1, threshold_2, threshold_3],
       edit_momentum_scale=0,
-      edit_mom_beta=0.6,
+      edit_mom_beta=0,
       eta=1,
       use_cross_attn_mask=use_cross_attn_mask,
       use_intersect_mask=use_intersect_mask
