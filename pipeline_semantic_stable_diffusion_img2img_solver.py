@@ -36,21 +36,19 @@ class AttentionStore():
 
     def __call__(self, attn, is_cross: bool, place_in_unet: str, editing_prompts, PnP=False):
         # attn.shape = batch_size * head_size, seq_len query, seq_len_key
-        bs = 2 + int(PnP) + editing_prompts
-        skip = 2 if PnP else 1  # skip PnP & unconditional
-
-        head_size = int(attn.shape[0] / self.batch_size)
-        attn = torch.stack(attn.split(self.batch_size)).permute(1, 0, 2, 3)
-        source_batch_size = int(attn.shape[1] // bs)
-        self.forward(
-            attn[:, skip * source_batch_size:],
-            is_cross,
-            place_in_unet)
+        if attn.shape[1] <= self.max_size:
+            bs = 1 + int(PnP) + editing_prompts
+            skip = 2 if PnP else 1  # skip PnP & unconditional
+            attn = torch.stack(attn.split(self.batch_size)).permute(1, 0, 2, 3)
+            source_batch_size = int(attn.shape[1] // bs)
+            self.forward(
+                attn[:, skip * source_batch_size:],
+                is_cross,
+                place_in_unet)
 
     def forward(self, attn, is_cross: bool, place_in_unet: str):
         key = f"{place_in_unet}_{'cross' if is_cross else 'self'}"
-        if attn.shape[1] <= 32 ** 2:  # avoid memory overhead
-            self.step_store[key].append(attn)
+        self.step_store[key].append(attn)
 
     def between_steps(self, store_step=True):
         if store_step:
@@ -96,12 +94,13 @@ class AttentionStore():
         out = out.sum(1) / out.shape[1]
         return out
 
-    def __init__(self, average: bool, batch_size=1):
+    def __init__(self, average: bool, batch_size=1, max_resolution=16):
         self.step_store = self.get_empty_store()
         self.attention_store = []
         self.cur_step = 0
         self.average = average
         self.batch_size = batch_size
+        self.max_size = max_resolution ** 2
 
 
 class CrossAttnProcessor:
@@ -433,10 +432,10 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
 
     # Modified from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.prepare_latents
     def prepare_latents(self, batch_size, num_channels_latents, height, width, dtype, device, latents):
-        shape = (batch_size, num_channels_latents, height // self.vae_scale_factor, width // self.vae_scale_factor)
+        # shape = (batch_size, num_channels_latents, height // self.vae_scale_factor, width // self.vae_scale_factor)
 
-        if latents.shape != shape:
-            raise ValueError(f"Unexpected latents shape, got {latents.shape}, expected {shape}")
+        # if latents.shape != shape:
+        #     raise ValueError(f"Unexpected latents shape, got {latents.shape}, expected {shape}")
 
         latents = latents.to(device)
 
@@ -456,7 +455,7 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
             else:
                 continue
 
-            if "attn2" in name:
+            if "attn2" in name and place_in_unet != 'mid':
                 attn_procs[name] = CrossAttnProcessor(
                     attention_store=attention_store,
                     place_in_unet=place_in_unet,
@@ -488,12 +487,11 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
             editing_prompt_embeddings: Optional[torch.Tensor] = None,
             reverse_editing_direction: Optional[Union[bool, List[bool]]] = False,
             edit_guidance_scale: Optional[Union[float, List[float]]] = 5,
-            edit_warmup_steps: Optional[Union[int, List[int]]] = 10,
+            edit_warmup_steps: Optional[Union[int, List[int]]] = 0,
             edit_cooldown_steps: Optional[Union[int, List[int]]] = None,
             edit_threshold: Optional[Union[float, List[float]]] = 0.9,
             user_mask: Optional[torch.FloatTensor] = None,
-            edit_momentum_scale: Optional[float] = 0.1,
-            edit_mom_beta: Optional[float] = 0.4,
+           
             edit_weights: Optional[List[float]] = None,
             sem_guidance: Optional[List[torch.Tensor]] = None,
             verbose=True,
@@ -788,8 +786,6 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
         # 6. Prepare extra step kwargs.
         extra_step_kwargs = self.prepare_extra_step_kwargs(eta)
 
-        # Initialize edit_momentum to None
-        edit_momentum = None
 
         self.uncond_estimates = None
         self.text_estimates = None
@@ -833,12 +829,10 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
                     self.text_estimates = torch.zeros((len(timesteps), *noise_pred_text.shape))
                 self.text_estimates[i] = noise_pred_text.detach().cpu()
 
-                if edit_momentum is None:
-                    edit_momentum = torch.zeros_like(noise_guidance)
+    
 
                 if sem_guidance is not None and len(sem_guidance) > i:
                     edit_guidance = sem_guidance[i].to(self.device)
-                    edit_momentum = edit_mom_beta * edit_momentum + (1 - edit_mom_beta) * edit_guidance
                     noise_guidance = noise_guidance + edit_guidance
 
                 elif enable_edit_guidance:
