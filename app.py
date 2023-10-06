@@ -34,61 +34,76 @@ def caption_image(input_image):
     generated_caption = blip_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     return generated_caption, generated_caption
 
-def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta = 1):
-    
-    latnets = wts.value[-1].expand(1, -1, -1, -1)
-    img = pipe(prompt=prompt_tar, 
-                          init_latents=latnets, 
-                          guidance_scale = cfg_scale_tar,
-                          # num_images_per_prompt=1,
-                          # num_inference_steps=steps,
-                          # use_ddpm=True,  
-                          # wts=wts.value, 
-                          zs=zs.value).images[0]
+def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
+    latents = wts[-1].expand(1, -1, -1, -1)
+    img = pipe(
+        prompt=prompt_tar,
+        init_latents=latents,
+        guidance_scale=cfg_scale_tar,
+        # num_images_per_prompt=1,
+        # num_inference_steps=steps,
+        # use_ddpm=True,
+        # wts=wts.value,
+        zs=zs,
+    ).images[0]
     return img
 
-def reconstruct(tar_prompt,
-                image_caption,
-                tar_cfg_scale,
-                skip,
-                wts, zs,
-                do_reconstruction,
-                reconstruction,
-                reconstruct_button
-               ):
 
+def reconstruct(
+    tar_prompt,
+    image_caption,
+    tar_cfg_scale,
+    skip,
+    wts,
+    zs,
+    do_reconstruction,
+    reconstruction,
+    reconstruct_button,
+):
     if reconstruct_button == "Hide Reconstruction":
-      return reconstruction.value, reconstruction, ddpm_edited_image.update(visible=False), do_reconstruction, "Show Reconstruction"
+        return (
+            reconstruction,
+            reconstruction,
+            ddpm_edited_image.update(visible=False),
+            do_reconstruction,
+            "Show Reconstruction",
+        )
 
     else:
-      if do_reconstruction:
-          if image_caption.lower() == tar_prompt.lower(): # if image caption was not changed, run actual reconstruction
-             tar_prompt = ""
-          latnets = wts.value[-1].expand(1, -1, -1, -1)
-          reconstruction_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
-          reconstruction = gr.State(value=reconstruction_img)
-          do_reconstruction = False
-      return reconstruction.value, reconstruction, ddpm_edited_image.update(visible=True), do_reconstruction, "Hide Reconstruction"
-
-
+        if do_reconstruction:
+            if (
+                image_caption.lower() == tar_prompt.lower()
+            ):  # if image caption was not changed, run actual reconstruction
+                tar_prompt = ""
+            latents = wts[-1].expand(1, -1, -1, -1)
+            reconstruction = sample(
+                zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale
+            )
+            do_reconstruction = False
+        return (
+            reconstruction,
+            reconstruction,
+            ddpm_edited_image.update(visible=True),
+            do_reconstruction,
+            "Hide Reconstruction",
+        )
 
 
 def load_and_invert(
-                    input_image,
-                    do_inversion,
-                    seed, randomize_seed,
-                    wts, zs,
-                    src_prompt ="",
-                    # tar_prompt="",
-                    steps=30,
-                    src_cfg_scale = 3.5,
-                    skip=15,
-                    tar_cfg_scale=15,
-                    progress=gr.Progress(track_tqdm=True)
-
+    input_image,
+    do_inversion,
+    seed,
+    randomize_seed,
+    wts,
+    zs,
+    src_prompt="",
+    # tar_prompt="",
+    steps=30,
+    src_cfg_scale=3.5,
+    skip=15,
+    tar_cfg_scale=15,
+    progress=gr.Progress(track_tqdm=True),
 ):
-
-
     # x0 = load_512(input_image, device=device).to(torch.float16)
 
     if do_inversion or randomize_seed:
@@ -96,16 +111,14 @@ def load_and_invert(
             seed = randomize_seed_fn()
         seed_everything(seed)
         # invert and retrieve noise maps and latent
-        zs_tensor, wts_tensor = pipe.invert(
-           image_path = input_image,
-           source_prompt =src_prompt,
-           source_guidance_scale= src_cfg_scale,
-           num_inversion_steps = steps,
-           skip = skip,
-           eta = 1.0,
-           )
-        wts = gr.State(value=wts_tensor)
-        zs = gr.State(value=zs_tensor)
+        zs, wts = pipe.invert(
+            image_path=input_image,
+            source_prompt=src_prompt,
+            source_guidance_scale=src_cfg_scale,
+            num_inversion_steps=steps,
+            skip=skip,
+            eta=1.0,
+        )
         do_inversion = False
 
     return wts, zs, do_inversion, inversion_progress.update(visible=False)
@@ -171,6 +184,8 @@ def edit(input_image,
       edit_warmup_steps=[warmup_1, warmup_2, warmup_3,],
       edit_guidance_scale=[guidnace_scale_1,guidnace_scale_2,guidnace_scale_3],
       edit_threshold=[threshold_1, threshold_2, threshold_3],
+      edit_momentum_scale=0,
+      edit_mom_beta=0.6,
       eta=1,
       use_cross_attn_mask=use_cross_attn_mask,
       use_intersect_mask=use_intersect_mask
