@@ -35,7 +35,7 @@ def caption_image(input_image):
     return generated_caption, generated_caption
 
 def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
-    latents = wts[-1].expand(1, -1, -1, -1)
+    latents = wts.value[-1].expand(1, -1, -1, -1)
     img = pipe(
         prompt=prompt_tar,
         init_latents=latents,
