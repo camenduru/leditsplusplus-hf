@@ -15,7 +15,8 @@ from transformers import AutoProcessor, BlipForConditionalGeneration
 from share_btn import community_icon_html, loading_icon_html, share_js
 
 # load pipelines
-sd_model_id = "runwayml/stable-diffusion-v1-5"
+# sd_model_id = "runwayml/stable-diffusion-v1-5"
+sd_model_id = "stabilityai/stable-diffusion-2-1-base"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=torch.float16)
 pipe = SemanticStableDiffusionImg2ImgPipeline_DPMSolver.from_pretrained(sd_model_id,vae=vae,torch_dtype=torch.float16, safety_checker=None, requires_safety_checker=False).to(device)
