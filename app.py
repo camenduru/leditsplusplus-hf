@@ -251,13 +251,14 @@ def get_example():
              'examples/car_output.png',
             
             
-            10,7,
+            13,7,
             2,2,
             False, False,
             50,
             25,
             7.5,
-            0.65, 0.8
+            0.65, 0.8,
+            890000000
            
              ],
         [
@@ -268,13 +269,14 @@ def get_example():
              'examples/girl_with_pearl_earring_output.png',
             
             
-            3,7,
+            4,7,
             3,2,
             False,False,
             50,
             25,
             5,
-            0.97, 0.95
+            0.97, 0.95,
+            1900000000
            
              ],
         
@@ -292,7 +294,9 @@ def get_example():
                       50,
             25,
             7,
-                     0.9, 0.9
+                     0.9, 0.9,
+            1900000000
+                     
             
              ],
        
@@ -850,6 +854,7 @@ with gr.Blocks(css="style.css") as demo:
                     tar_cfg_scale,
                     threshold_1, 
                     threshold_2,
+                    seed,
                     sega_concepts_counter
                ],
         outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,sega_concepts_counter],
