@@ -160,7 +160,7 @@ def edit(input_image,
         use_intersect_mask = True 
 
     if randomize_seed:
-        seed = randomize_seed_fn()
+        seed = randomize_seed_fn(seed, randomize_seed)
     seed_everything(seed)
 
     if do_inversion or randomize_seed:
