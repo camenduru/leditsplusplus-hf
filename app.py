@@ -108,8 +108,7 @@ def load_and_invert(
     # x0 = load_512(input_image, device=device).to(torch.float16)
 
     if do_inversion or randomize_seed:
-        if randomize_seed:
-            seed = randomize_seed_fn()
+        seed = randomize_seed_fn(seed, randomize_seed)
         seed_everything(seed)
         # invert and retrieve noise maps and latent
         zs_tensor, wts_tensor = pipe.invert(
