@@ -585,14 +585,7 @@ with gr.Blocks(css="style.css") as demo:
 
 
     
-    with gr.Row().style(mobile_collapse=False, equal_height=True):
-                tar_prompt = gr.Textbox(
-                                label="Describe your edited image (optional)",
-                                elem_id="target_prompt",
-                                # show_label=False,
-                                max_lines=1, value="", scale=3,
-                                placeholder="Target prompt, DDPM Inversion", info = "DPM Solver++ Inversion Prompt. Can help with global changes, modify to what you would like to see"
-                            )
+    
                 # caption_button = gr.Button("Caption Image", scale=1)
         
     
@@ -601,6 +594,14 @@ with gr.Blocks(css="style.css") as demo:
         
 
     with gr.Accordion("Advanced Options", open=False):
+      with gr.Row().style(mobile_collapse=False, equal_height=True):
+                tar_prompt = gr.Textbox(
+                                label="Describe your edited image (optional)",
+                                elem_id="target_prompt",
+                                # show_label=False,
+                                max_lines=1, value="", scale=3,
+                                placeholder="Target prompt, DDPM Inversion", info = "DPM Solver++ Inversion Prompt. Can help with global changes, modify to what you would like to see"
+                            )
       with gr.Tabs() as tabs:
 
           with gr.TabItem('General options', id=2):
