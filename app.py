@@ -245,36 +245,36 @@ def get_example():
         [
             'examples/car_input.png', 
             # '',
-            'cherry blossom', 'green cabriolet',
-            '',
+            'cherry blossom', 'green cabriolet','yellow car',
+   
              'examples/car_output.png',
             
             
-            13,7,
-            2,2,
-            False, False,
+            13,11,7,
+            2,2,2,
+            False, False, True,
             50,
             25,
             7.5,
-            0.65, 0.8,
+            0.65, 0.8, 0.8,
             890000000
            
              ],
         [
             'examples/girl_with_pearl_earring_input.png', 
             # '',
-            'glasses', '',
-            '',
+            'glasses', '','',
+
              'examples/girl_with_pearl_earring_output.png',
             
             
-            4,7,
-            3,2,
-            False,False,
+            4,7,0,
+            3,2,2,
+            False,False,False,
             50,
             25,
             5,
-            0.97, 0.95,
+            0.97, 0.95,0.95,
             1900000000
            
              ],
@@ -287,13 +287,13 @@ def get_example():
              'examples/flower_field_output.png',
 
 
-            20,7,
-            1,1,
-                     False,True,
+            20,7,10,
+            1,1,1,
+                     False,True,False,
                       50,
             25,
             7,
-                     0.9, 0.9,
+                     0.9, 0.9,0.8,
             1900000000
                      
             
@@ -846,19 +846,24 @@ with gr.Blocks(css="style.css") as demo:
         inputs=[input_image,
                     edit_concept_1,
                     edit_concept_2,
+                edit_concept_3,
                     tar_prompt,
                     sega_edited_image,
                     guidnace_scale_1,
                     guidnace_scale_2,
+                guidnace_scale_3,
                     warmup_1,
                     warmup_2,
+                warmup_3,
                     neg_guidance_1,
                     neg_guidance_2,
+                neg_guidance_3,
                     steps,
                     skip,
                     tar_cfg_scale,
                     threshold_1, 
                     threshold_2,
+                threshold_3,
                     seed,
                     sega_concepts_counter
                ],
