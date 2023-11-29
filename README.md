@@ -9,4 +9,4 @@ app_file: app.py
 pinned: true
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+Paper: https://arxiv.org/abs/2311.1671
