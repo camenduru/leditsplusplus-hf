@@ -343,11 +343,19 @@ intro = """
    LEDITS++: Limitless Image Editing using Text-to-Image Models
 </h1>
 
-<p style="font-size: 0.9rem; margin: 0rem; line-height: 1.2em; margin-top:1em; display: inline-block">
-<a href="https://leditsplusplus-project.static.hf.space" target="_blank">project page</a> | <a href="https://huggingface.co/papers/2311.16711" target="_blank">paper</a>
-<a href="https://huggingface.co/spaces/leditsplusplus/demo?duplicate=true">
-<img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3CWLGkA" alt="Duplicate Space"></a>
-<p/>"""
+<p style="font-size: 0.95rem;margin: 0rem;line-height: 1.2em;margin-top:1em;display: inline-block">
+    <a href="https://leditsplusplus-project.static.hf.space" target="_blank" style="
+        color: white;
+    ">project page</a> | <a href="https://huggingface.co/papers/2311.16711" target="_blank" style="
+        color: white;
+    ">paper</a>
+     | 
+    <a href="https://huggingface.co/spaces/leditsplusplus/demo?duplicate=true" target="_blank" style="
+        display: inline-block;
+    ">
+    <img style="margin-top: -1em;margin-bottom: 0em;position: absolute;" src="https://bit.ly/3CWLGkA" alt="Duplicate Space"></a>
+</p>
+"""
 
 
 with gr.Blocks(css="style.css") as demo:
