@@ -147,7 +147,8 @@ def edit(input_image,
             randomize_seed,
             src_prompt,
             src_cfg_scale,
-            mask_type):
+            mask_type,
+            progress=gr.Progress(track_tqdm=True)):
     show_share_button = gr.update(visible=True)
     if(mask_type == "No mask"):
         use_cross_attn_mask = False
