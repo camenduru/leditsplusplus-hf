@@ -847,7 +847,6 @@ with gr.Blocks(css="style.css") as demo:
                     edit_concept_1,
                     edit_concept_2,
                 edit_concept_3,
-                    tar_prompt,
                     sega_edited_image,
                     guidnace_scale_1,
                     guidnace_scale_2,
