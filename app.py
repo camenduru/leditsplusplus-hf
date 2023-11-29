@@ -346,7 +346,7 @@ intro = """
 <p style="font-size: 0.95rem;margin: 0rem;line-height: 1.2em;margin-top:1em;display: inline-block">
     <a href="https://leditsplusplus-project.static.hf.space" target="_blank" style="
         color: white;
-    ">project page</a> | <a href="https:/arxiv.org/abs/2311.16711" target="_blank" style="
+    ">project page</a> | <a href="https://arxiv.org/abs/2311.16711" target="_blank" style="
         color: white;
     ">paper</a>
      | 
