@@ -468,7 +468,7 @@ with gr.Blocks(css="style.css") as demo:
         ddpm_edited_image = gr.Image(label=f"Pure DDPM Inversion Image", interactive=False, visible=False)
         sega_edited_image = gr.Image(label=f"LEDITS Edited Image", interactive=False, elem_id="output_image")
 
-    with gr.Group(visible=False) as share_btn_container:
+    with gr.Group(visible=False, elem_id="share-btn-wrapper") as share_btn_container:
         with gr.Group(elem_id="share-btn-container"):
             community_icon = gr.HTML(community_icon_html, visible=True)
             loading_icon = gr.HTML(loading_icon_html, visible=False)
