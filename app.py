@@ -330,10 +330,12 @@ def swap_visibilities(input_image,
     concept1_update = update_display_concept("Remove" if neg_guidance_1 else "Add", edit_concept_1, neg_guidance_1, sega_concepts_counter)
     if(edit_concept_2 != ""):
         concept2_update = update_display_concept("Remove" if neg_guidance_2 else "Add", edit_concept_2, neg_guidance_2, sega_concepts_counter+1)
+        if(edit_concept_3 != ""):
+            concept3_update = update_display_concept("Remove" if neg_guidance_3 else "Add", edit_concept_3, neg_guidance_3, sega_concepts_counter+2)
     else:
         concept2_update = gr.update(visible=False), gr.update(visible=False),gr.update(visible=False), gr.update(value=neg_guidance_2),gr.update(visible=True),gr.update(visible=False),sega_concepts_counter+1
-    
-    return (gr.update(visible=True), *concept1_update[:-1], *concept2_update)
+        concept3_update = gr.update(visible=False), gr.update(visible=False),gr.update(visible=False), gr.update(value=neg_guidance_3),gr.update(visible=False),gr.update(visible=False),sega_concepts_counter+1
+    return (gr.update(visible=True), *concept1_update[:-1], *concept2_update[:-1], *concept3_update)
     
 
 
@@ -870,7 +872,7 @@ with gr.Blocks(css="style.css") as demo:
                     seed,
                     sega_concepts_counter
                ],
-        outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,sega_concepts_counter],
+        outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,box3, concept_3, guidnace_scale_3,neg_guidance_3,row3, row3,sega_concepts_counter],
         cache_examples=True
     )
 
