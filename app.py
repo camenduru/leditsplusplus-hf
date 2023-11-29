@@ -65,7 +65,7 @@ def reconstruct(
         return (
             reconstruction,
             reconstruction,
-            ddpm_edited_image.update(visible=False),
+            gr.update(visible=False),
             do_reconstruction,
             "Show Reconstruction",
         )
@@ -84,7 +84,7 @@ def reconstruct(
         return (
             reconstruction,
             reconstruction,
-            ddpm_edited_image.update(visible=True),
+            gr.update(visible=True),
             do_reconstruction,
             "Hide Reconstruction",
         )
@@ -123,7 +123,7 @@ def load_and_invert(
         zs = gr.State(value=zs_tensor)
         do_inversion = False
 
-    return wts, zs, do_inversion, inversion_progress.update(visible=False)
+    return wts, zs, do_inversion, gr.update(visible=False)
 
 ## SEGA ##
 
@@ -203,7 +203,7 @@ def edit(input_image,
                           # wts=wts.value, 
                           zs=zs.value, **editing_args)
       
-      return sega_out.images[0], reconstruct_button.update(visible=True), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+      return sega_out.images[0], gr.update(visible=True), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
     
     
     else: # if sega concepts were not added, performs regular ddpm sampling
@@ -212,9 +212,9 @@ def edit(input_image,
           pure_ddpm_img = sample(zs.value, wts.value, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
           reconstruction = gr.State(value=pure_ddpm_img)
           do_reconstruction = False
-          return pure_ddpm_img, reconstruct_button.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+          return pure_ddpm_img, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
       
-      return reconstruction.value, reconstruct_button.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+      return reconstruction.value, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
         
 
 def randomize_seed_fn(seed, is_random):
@@ -330,12 +330,10 @@ def swap_visibilities(input_image,
     concept1_update = update_display_concept("Remove" if neg_guidance_1 else "Add", edit_concept_1, neg_guidance_1, sega_concepts_counter)
     if(edit_concept_2 != ""):
         concept2_update = update_display_concept("Remove" if neg_guidance_2 else "Add", edit_concept_2, neg_guidance_2, sega_concepts_counter+1)
-        if(edit_concept_3 != ""):
-            concept3_update = update_display_concept("Remove" if neg_guidance_3 else "Add", edit_concept_3, neg_guidance_3, sega_concepts_counter+2)
     else:
         concept2_update = gr.update(visible=False), gr.update(visible=False),gr.update(visible=False), gr.update(value=neg_guidance_2),gr.update(visible=True),gr.update(visible=False),sega_concepts_counter+1
-        concept3_update = gr.update(visible=False), gr.update(visible=False),gr.update(visible=False), gr.update(value=neg_guidance_3),gr.update(visible=False),gr.update(visible=False),sega_concepts_counter+1
-    return (gr.update(visible=True), *concept1_update[:-1], *concept2_update[:-1], *concept3_update)
+    
+    return (gr.update(visible=True), *concept1_update[:-1], *concept2_update)
     
 
 
@@ -414,7 +412,7 @@ with gr.Blocks(css="style.css") as demo:
 
 
     def display_editing_options(run_button, clear_button, sega_tab):
-      return run_button.update(visible=True), clear_button.update(visible=True), sega_tab.update(visible=True)
+      return gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
     
     def update_interactive_mode(add_button_label):
       if add_button_label == "Clear":
@@ -445,15 +443,15 @@ with gr.Blocks(css="style.css") as demo:
 
     def update_inversion_progress_visibility(input_image, do_inversion):
       if do_inversion and not input_image is None:
-          return inversion_progress.update(visible=True)
+          return gr.update(visible=True)
       else:
-        return inversion_progress.update(visible=False)
+        return gr.update(visible=False)
 
     def update_edit_progress_visibility(input_image, do_inversion):
       # if do_inversion and not input_image is None:
       #     return inversion_progress.update(visible=True)
       # else:
-        return inversion_progress.update(visible=True)
+        return gr.update(visible=True)
 
 
     gr.HTML(intro)
@@ -469,10 +467,7 @@ with gr.Blocks(css="style.css") as demo:
         input_image = gr.Image(label="Input Image", interactive=True, elem_id="input_image")
         ddpm_edited_image = gr.Image(label=f"Pure DDPM Inversion Image", interactive=False, visible=False)
         sega_edited_image = gr.Image(label=f"LEDITS Edited Image", interactive=False, elem_id="output_image")
-        input_image.style(height=365, width=365)
-        ddpm_edited_image.style(height=365, width=365)
-        sega_edited_image.style(height=365, width=365)
-    
+
     with gr.Group(visible=False) as share_btn_container:
         with gr.Group(elem_id="share-btn-container"):
             community_icon = gr.HTML(community_icon_html, visible=True)
@@ -480,7 +475,7 @@ with gr.Blocks(css="style.css") as demo:
             share_button = gr.Button("Share to community", elem_id="share-btn", visible=True)
         
     with gr.Row():
-      with gr.Box(visible=False, elem_id="box1") as box1:
+      with gr.Group(visible=False, elem_id="box1") as box1:
         with gr.Row():
           concept_1 = gr.Button(scale=3, value="")
           remove_concept1 = gr.Button("x", scale=1, min_width=10)
@@ -489,7 +484,7 @@ with gr.Blocks(css="style.css") as demo:
                             info="How strongly the concept should modify the image",
                                                   value=DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,
                                                   step=0.5, interactive=True)
-      with gr.Box(visible=False, elem_id="box2") as box2:
+      with gr.Group(visible=False, elem_id="box2") as box2:
         with gr.Row():
           concept_2 = gr.Button(scale=3, value="")
           remove_concept2 = gr.Button("x", scale=1, min_width=10)
@@ -498,7 +493,7 @@ with gr.Blocks(css="style.css") as demo:
                               info="How strongly the concept should modify the image",
                                                     value=DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,
                                                     step=0.5, interactive=True)
-      with gr.Box(visible=False, elem_id="box3") as box3:
+      with gr.Group(visible=False, elem_id="box3") as box3:
         with gr.Row():
           concept_3 = gr.Button(scale=3, value="")
           remove_concept3 = gr.Button("x", scale=1, min_width=10)
@@ -512,12 +507,12 @@ with gr.Blocks(css="style.css") as demo:
     with gr.Row():
         inversion_progress = gr.Textbox(visible=False, label="Inversion progress")
         
-    with gr.Box():
+    with gr.Group():
         intro_segs = gr.Markdown("Add/Remove Concepts from your Image <span style=\"font-size: 12px; color: rgb(156, 163, 175)\">with Semantic Guidance</span>")
                   # 1st SEGA concept
-        with gr.Row().style(mobile_collapse=False) as row1:
+        with gr.Row() as row1:
               with gr.Column(scale=3, min_width=100):
-                  with gr.Row().style(mobile_collapse=True):
+                  with gr.Row():
                       # with gr.Column(scale=3, min_width=100):
                             edit_concept_1 = gr.Textbox(
                                               label="Concept",
@@ -534,16 +529,16 @@ with gr.Blocks(css="style.css") as demo:
                           label='Remove Concept?')
               
               with gr.Column(scale=1, min_width=100):
-                   with gr.Row().style(mobile_collapse=False): # better mobile ui
+                   with gr.Row(): # better mobile ui
                        with gr.Column():
                           add_1 = gr.Button('Add')
                           remove_1 = gr.Button('Remove')
              
     
                   # 2nd SEGA concept
-        with gr.Row(visible=False).style(equal_height=True) as row2:
+        with gr.Row(visible=False) as row2:
             with gr.Column(scale=3, min_width=100):
-                with gr.Row().style(mobile_collapse=True): #better mobile UI
+                with gr.Row(): #better mobile UI
                     # with gr.Column(scale=3, min_width=100):
                             edit_concept_2 = gr.Textbox(
                                               label="Concept",
@@ -559,15 +554,15 @@ with gr.Blocks(css="style.css") as demo:
                           label='Remove Concept?')
                 
             with gr.Column(scale=1, min_width=100):
-                with gr.Row().style(mobile_collapse=False): # better mobile ui
+                with gr.Row(): # better mobile ui
                     with gr.Column():
                       add_2 = gr.Button('Add')
                       remove_2 = gr.Button('Remove')
     
                   # 3rd SEGA concept
-        with gr.Row(visible=False).style(equal_height=True) as row3:
+        with gr.Row(visible=False) as row3:
             with gr.Column(scale=3, min_width=100):
-                with gr.Row().style(mobile_collapse=True): #better mobile UI  
+                with gr.Row(): #better mobile UI  
                     # with gr.Column(scale=3, min_width=100):
                             edit_concept_3 = gr.Textbox(
                                               label="Concept",
@@ -583,12 +578,12 @@ with gr.Blocks(css="style.css") as demo:
                               label='Remove Concept?',visible=True)
             
             with gr.Column(scale=1, min_width=100):
-                with gr.Row().style(mobile_collapse=False): # better mobile ui
+                with gr.Row(): # better mobile ui
                     with gr.Column():
                          add_3 = gr.Button('Add')
                          remove_3 = gr.Button('Remove')
     
-        with gr.Row(visible=False).style(equal_height=True) as row4:
+        with gr.Row(visible=False) as row4:
             gr.Markdown("### Max of 3 concepts reached. Remove a concept to add more")
     
         #with gr.Row(visible=False).style(mobile_collapse=False, equal_height=True):
@@ -605,7 +600,7 @@ with gr.Blocks(css="style.css") as demo:
         
 
     with gr.Accordion("Advanced Options", open=False):
-      with gr.Row().style(mobile_collapse=False, equal_height=True):
+      with gr.Row():
                 tar_prompt = gr.Textbox(
                                 label="Describe your edited image (optional)",
                                 elem_id="target_prompt",
@@ -634,7 +629,7 @@ with gr.Blocks(css="style.css") as demo:
           with gr.TabItem('SEGA options', id=3) as sega_advanced_tab:
              # 1st SEGA concept
               gr.Markdown("1st concept")
-              with gr.Row().style(mobile_collapse=False, equal_height=True):
+              with gr.Row():
                   warmup_1 = gr.Slider(label='Warmup', minimum=0, maximum=50,
                                        value=DEFAULT_WARMUP_STEPS,
                                        step=1, interactive=True, info="At which step to start applying semantic guidance. Bigger values reduce edit concept's effect")
@@ -814,16 +809,16 @@ with gr.Blocks(css="style.css") as demo:
                                   edit_concept_3, guidnace_scale_3,guidnace_scale_3,warmup_3,  threshold_3, neg_guidance_3,dropdown3, concept_3,concept_3, row3,
                                   row4,sega_concepts_counter, box1, box2, box3 ]
 
-    clear_components_output_vals = [None, None,ddpm_edited_image.update(visible=False), None, True,
+    clear_components_output_vals = [None, None,gr.update(visible=False), None, True,
                      "", DEFAULT_DIFFUSION_STEPS, DEFAULT_SOURCE_GUIDANCE_SCALE, DEFAULT_SEED,
-                     "", DEFAULT_SKIP_STEPS, DEFAULT_TARGET_GUIDANCE_SCALE, reconstruct_button.update(value="Show Reconstruction"),reconstruct_button.update(visible=False),
-                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,guidnace_scale_1.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","", concept_1.update(visible=False), row1.update(visible=True),
-                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,guidnace_scale_2.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","", concept_2.update(visible=False), row2.update(visible=False),
-                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,guidnace_scale_3.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","",concept_3.update(visible=False), row3.update(visible=False), row4.update(visible=False), gr.update(value=0),
-                          box1.update(visible=False), box2.update(visible=False), box3.update(visible=False)]
+                     "", DEFAULT_SKIP_STEPS, DEFAULT_TARGET_GUIDANCE_SCALE, gr.update(value="Show Reconstruction"),gr.update(visible=False),
+                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,gr.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","", gr.update(visible=False), gr.update(visible=True),
+                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,gr.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","", gr.update(visible=False), gr.update(visible=False),
+                     "", DEFAULT_SEGA_CONCEPT_GUIDANCE_SCALE,gr.update(visible=False), DEFAULT_WARMUP_STEPS, DEFAULT_THRESHOLD, DEFAULT_NEGATIVE_GUIDANCE, "custom","",gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(value=0),
+                          gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)]
 
 
-    clear_button.click(lambda: clear_components_output_vals, outputs =clear_components)
+    clear_button.click(lambda: clear_components_output_vals, outputs = clear_components)
 
     reconstruct_button.click(lambda: ddpm_edited_image.update(visible=True), outputs=[ddpm_edited_image]).then(fn = reconstruct,
                 inputs = [tar_prompt,
@@ -842,7 +837,7 @@ with gr.Blocks(css="style.css") as demo:
         outputs = [seed],
         queue = False)
 
-    share_button.click(None, [], [], _js=share_js)
+    share_button.click(None, [], [], js=share_js)
     
     gr.Examples(
         label='Examples',
@@ -872,7 +867,7 @@ with gr.Blocks(css="style.css") as demo:
                     seed,
                     sega_concepts_counter
                ],
-        outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,box3, concept_3, guidnace_scale_3,neg_guidance_3,row3, row3,sega_concepts_counter],
+        outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,sega_concepts_counter],
         cache_examples=True
     )
 
