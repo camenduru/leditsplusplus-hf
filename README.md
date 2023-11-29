@@ -9,4 +9,4 @@ app_file: app.py
 pinned: true
 ---
 
-Paper: https://arxiv.org/abs/2311.1671
+Paper: arxiv.org/abs/2311.1671
