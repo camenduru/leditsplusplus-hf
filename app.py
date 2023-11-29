@@ -751,7 +751,7 @@ with gr.Blocks(css="style.css") as demo:
         outputs=[wts, zs, do_inversion, inversion_progress],
     ).then(fn = update_inversion_progress_visibility, inputs =[input_image,do_inversion],
            outputs=[inversion_progress],queue=False).then(
-              lambda: reconstruct_button.update(visible=False),
+              lambda: gr.update(visible=False),
               outputs=[reconstruct_button]).then(
         fn = reset_do_reconstruction,
         outputs = [do_reconstruction],
