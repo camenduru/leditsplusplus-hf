@@ -499,6 +499,7 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
             verbose=True,
             use_cross_attn_mask: bool = False,
             # Attention store (just for visualization purposes)
+            attention_store = None,
             attn_store_steps: Optional[List[int]] = [],
             store_averaged_over_steps: bool = True,
             use_intersect_mask: bool = False,
@@ -771,8 +772,8 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
             timesteps = timesteps[-zs.shape[0]:]
 
         if use_cross_attn_mask:
-            self.attention_store = AttentionStore(average=store_averaged_over_steps, batch_size=batch_size)
-            self.prepare_unet(self.attention_store, PnP=False)
+            attention_store = AttentionStore(average=store_averaged_over_steps, batch_size=batch_size)
+            self.prepare_unet(attention_store, PnP=False)
         # 5. Prepare latent variables
         num_channels_latents = self.unet.config.in_channels
         latents = self.prepare_latents(
@@ -917,8 +918,8 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
                             noise_guidance_edit_tmp = noise_guidance_edit_tmp * user_mask
 
                         if use_cross_attn_mask:
-                            out = self.attention_store.aggregate_attention(
-                                attention_maps=self.attention_store.step_store,
+                            out = attention_store.aggregate_attention(
+                                attention_maps=attention_store.step_store,
                                 prompts=self.text_cross_attention_maps,
                                 res=16,
                                 from_where=["up", "down"],
@@ -1080,7 +1081,7 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
                 store_step = i in attn_store_steps
                 if store_step:
                     print(f"storing attention for step {i}")
-                self.attention_store.between_steps(store_step)
+                attention_store.between_steps(store_step)
 
             # call the callback, if provided
             if callback is not None and i % callback_steps == 0:
@@ -1102,9 +1103,9 @@ class SemanticStableDiffusionImg2ImgPipeline_DPMSolver(DiffusionPipeline):
         image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
 
         if not return_dict:
-            return (image, has_nsfw_concept)
+            return (image, has_nsfw_concept), attention_store
 
-        return SemanticStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
+        return SemanticStableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept),  attention_store
 
     def encode_text(self, prompts):
         text_inputs = self.tokenizer(

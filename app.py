@@ -35,9 +35,9 @@ def caption_image(input_image):
     generated_caption = blip_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     return generated_caption, generated_caption
 
-def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
+def sample(zs, wts, attention_store, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
     latents = wts[-1].expand(1, -1, -1, -1)
-    img = pipe(
+    img, attention_store = pipe(
         prompt=prompt_tar,
         init_latents=latents,
         guidance_scale=cfg_scale_tar,
@@ -45,9 +45,10 @@ def sample(zs, wts, prompt_tar="", cfg_scale_tar=15, skip=36, eta=1):
         # num_inference_steps=steps,
         # use_ddpm=True,
         # wts=wts.value,
+        attention_store = attention_store,
         zs=zs,
-    ).images[0]
-    return img
+    )
+    return img.images[0], attention_store
 
 
 def reconstruct(
@@ -57,6 +58,7 @@ def reconstruct(
     skip,
     wts,
     zs,
+    attention_store,
     do_reconstruction,
     reconstruction,
     reconstruct_button,
@@ -77,8 +79,8 @@ def reconstruct(
             ):  # if image caption was not changed, run actual reconstruction
                 tar_prompt = ""
             latents = wts[-1].expand(1, -1, -1, -1)
-            reconstruction = sample(
-                zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale
+            reconstruction, attention_store = sample(
+                zs, wts, attention_store=attention_store, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale
             )
             do_reconstruction = False
         return (
@@ -128,7 +130,7 @@ def load_and_invert(
 ## SEGA ##
 
 def edit(input_image,
-            wts, zs,
+            wts, zs, attention_store,
             tar_prompt,
             image_caption,
             steps,
@@ -195,27 +197,27 @@ def edit(input_image,
       )
 
       latnets = wts[-1].expand(1, -1, -1, -1)
-      sega_out = pipe(prompt=tar_prompt, 
+      sega_out, attention_store = pipe(prompt=tar_prompt, 
                           init_latents=latnets, 
                           guidance_scale = tar_cfg_scale,
                           # num_images_per_prompt=1,
                           # num_inference_steps=steps,
                           # use_ddpm=True,  
                           # wts=wts.value, 
-                          zs=zs, **editing_args)
+                          zs=zs, attention_store=attention_store, **editing_args)
       
-      return sega_out.images[0], gr.update(visible=True), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+      return sega_out.images[0], gr.update(visible=True), do_reconstruction, reconstruction, wts, zs, attention_store, do_inversion, show_share_button
     
     
     else: # if sega concepts were not added, performs regular ddpm sampling
       
       if do_reconstruction: # if ddpm sampling wasn't computed
-          pure_ddpm_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
+          pure_ddpm_img, attention_store = sample(zs, wts, attention_store=attention_store, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
           reconstruction = pure_ddpm_img
           do_reconstruction = False
-          return pure_ddpm_img, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+          return pure_ddpm_img, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, attention_store, do_inversion, show_share_button
       
-      return reconstruction, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+      return reconstruction, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, attention_store, do_inversion, show_share_button
         
 
 def randomize_seed_fn(seed, is_random):
@@ -458,6 +460,7 @@ with gr.Blocks(css="style.css") as demo:
     gr.HTML(intro)
     wts = gr.State()
     zs = gr.State()
+    attention_store=gr.State()
     reconstruction = gr.State()
     do_inversion = gr.State(value=True)
     do_reconstruction = gr.State(value=True)
@@ -693,7 +696,7 @@ with gr.Blocks(css="style.css") as demo:
     run_button.click(
         fn=edit,
         inputs=[input_image,
-                wts, zs,
+                wts, zs, attention_store,
                 tar_prompt,
                 image_caption,
                 steps,
@@ -713,7 +716,7 @@ with gr.Blocks(css="style.css") as demo:
 
 
         ],
-        outputs=[sega_edited_image, reconstruct_button, do_reconstruction, reconstruction, wts, zs, do_inversion, share_btn_container])
+        outputs=[sega_edited_image, reconstruct_button, do_reconstruction, reconstruction, wts, zs,attention_store, do_inversion, share_btn_container])
     # .success(fn=update_gallery_display, inputs= [prev_output_image, sega_edited_image], outputs = [gallery, gallery, prev_output_image])
 
 
