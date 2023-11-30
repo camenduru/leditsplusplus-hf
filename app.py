@@ -119,8 +119,8 @@ def load_and_invert(
             skip=skip,
             eta=1.0,
         )
-        wts = gr.State(value=wts_tensor)
-        zs = gr.State(value=zs_tensor)
+        wts = wts_tensor
+        zs = zs_tensor
         do_inversion = False
 
     return wts, zs, do_inversion, gr.update(visible=False)
@@ -173,8 +173,8 @@ def edit(input_image,
            skip = skip,
            eta = 1.0,
            )
-        wts = gr.State(value=wts_tensor)
-        zs = gr.State(value=zs_tensor)
+        wts = wts_tensor
+        zs = zs_tensor
         do_inversion = False
     
     if image_caption.lower() == tar_prompt.lower(): # if image caption was not changed, run pure sega
@@ -194,7 +194,7 @@ def edit(input_image,
       use_intersect_mask=use_intersect_mask
       )
 
-      latnets = wts.value[-1].expand(1, -1, -1, -1)
+      latnets = wts[-1].expand(1, -1, -1, -1)
       sega_out = pipe(prompt=tar_prompt, 
                           init_latents=latnets, 
                           guidance_scale = tar_cfg_scale,
@@ -202,7 +202,7 @@ def edit(input_image,
                           # num_inference_steps=steps,
                           # use_ddpm=True,  
                           # wts=wts.value, 
-                          zs=zs.value, **editing_args)
+                          zs=zs, **editing_args)
       
       return sega_out.images[0], gr.update(visible=True), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
     
@@ -210,12 +210,12 @@ def edit(input_image,
     else: # if sega concepts were not added, performs regular ddpm sampling
       
       if do_reconstruction: # if ddpm sampling wasn't computed
-          pure_ddpm_img = sample(zs.value, wts.value, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
-          reconstruction = gr.State(value=pure_ddpm_img)
+          pure_ddpm_img = sample(zs, wts, prompt_tar=tar_prompt, skip=skip, cfg_scale_tar=tar_cfg_scale)
+          reconstruction = pure_ddpm_img
           do_reconstruction = False
           return pure_ddpm_img, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
       
-      return reconstruction.value, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
+      return reconstruction, gr.update(visible=False), do_reconstruction, reconstruction, wts, zs, do_inversion, show_share_button
         
 
 def randomize_seed_fn(seed, is_random):
@@ -871,7 +871,6 @@ with gr.Blocks(css="style.css") as demo:
         outputs=[share_btn_container, box1, concept_1, guidnace_scale_1,neg_guidance_1, row1, row2,box2, concept_2, guidnace_scale_2,neg_guidance_2,row2, row3,sega_concepts_counter],
         cache_examples=True
     )
-
 
 demo.queue()
 demo.launch()
