@@ -106,7 +106,7 @@ def load_and_invert(
     progress=gr.Progress(track_tqdm=True),
 ):
     # x0 = load_512(input_image, device=device).to(torch.float16)
-    do_inversion = True
+
     if do_inversion or randomize_seed:
         seed = randomize_seed_fn(seed, randomize_seed)
         seed_everything(seed)
@@ -121,8 +121,8 @@ def load_and_invert(
         )
         wts = wts_tensor
         zs = zs_tensor
-        #do_inversion = False
-    
+        do_inversion = False
+
     return wts, zs, do_inversion, gr.update(visible=False)
 
 ## SEGA ##
@@ -159,8 +159,7 @@ def edit(input_image,
     elif(mask_type=="Intersect Mask"):
         use_cross_attn_mask = False
         use_intersect_mask = True 
-    
-    do_inversion = True
+
     if randomize_seed:
         seed = randomize_seed_fn(seed, randomize_seed)
     seed_everything(seed)
@@ -176,7 +175,7 @@ def edit(input_image,
            )
         wts = wts_tensor
         zs = zs_tensor
-        #do_inversion = False
+        do_inversion = False
     
     if image_caption.lower() == tar_prompt.lower(): # if image caption was not changed, run pure sega
           tar_prompt = ""
